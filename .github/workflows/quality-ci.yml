@@ -1,0 +1,34 @@
+---
+name: "QA and Code Quality"
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install QA tools
+        run: python -m pip install pytest pytest-cov
+      - name: Run tests and generate reports
+        run: |
+          python -m pytest -q \
+            --cov=app --cov-branch \
+            --cov-report=xml:coverage.xml \
+            --junitxml=test-results.xml
+      - name: SonarQube analysis and gate wait
+        uses: SonarSource/sonarqube-scan-action@v7
+        with:
+          args: >
+            -Dsonar.qualitygate.wait=true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
