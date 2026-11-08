@@ -24,7 +24,7 @@ jobs:
           python -m pytest -q \
             --cov=app --cov-branch \
             --cov-report=xml:coverage.xml \
-            --junitxml=test-results.xml
+            --junitxml=test-results.xml \
             --cov-fail-under=80
       - name: SonarQube analysis and gate wait
         uses: SonarSource/sonarqube-scan-action@v7
